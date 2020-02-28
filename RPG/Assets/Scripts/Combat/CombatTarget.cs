@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RPG.Core
+namespace RPG.Combat
 {
-    public class FollowCamera : MonoBehaviour
+    public class CombatTarget : MonoBehaviour
     {
-        [SerializeField] private Transform target;
-
         // Start is called before the first frame update
         void Start()
         {
@@ -15,9 +13,9 @@ namespace RPG.Core
         }
 
         // Update is called once per frame
-        void LateUpdate()
+        void Update()
         {
-            this.transform.position = target.position;
+
         }
     }
 }
