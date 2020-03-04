@@ -9,16 +9,20 @@ namespace RPG.Combat
     {
         [SerializeField] private float weaponRange = 2f;
         [SerializeField] private float timeBetweenAttacks = 1f;
+        [SerializeField] private float weaponDamage = 10f;
 
         private float timeSinceLastAttack = 0;
 
-        private Transform target;
+        private Health target;
+
         private ActionScheduler actionScheduler;
         private Animator animator;
+        private Mover mover;
         void Start()
         {
             actionScheduler = GetComponent<ActionScheduler>();
             animator = GetComponent<Animator>();
+            mover = GetComponent<Mover>();
         }
 
         private void Update()
@@ -30,14 +34,14 @@ namespace RPG.Combat
         private void MoveToAttack()
         {
             if (target == null) return;
-
+            
             if (!GetIsInRange())
             {
-                GetComponent<Mover>().MoveTo(target.position);
+                mover.MoveTo(target.transform.position);
             }
             else
             {
-                GetComponent<Mover>().Cancel();
+                mover.Cancel();
 
                 if (timeSinceLastAttack > timeBetweenAttacks)
                 {
@@ -49,12 +53,13 @@ namespace RPG.Combat
 
         private void AttackBehaviour()
         {
+            this.transform.LookAt(target.transform);
             animator.SetTrigger("attack");
         }
 
         private bool GetIsInRange()
         {
-            return Vector3.Distance(transform.position, target.position) < weaponRange;
+            return Vector3.Distance(transform.position, target.transform.position) < weaponRange;
         }
 
         public bool PlayerAttack()
@@ -62,12 +67,12 @@ namespace RPG.Combat
             RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
             foreach (RaycastHit hit in hits)
             {
-                CombatTarget target = hit.transform.GetComponent<CombatTarget>();
-                if (target == null) continue;
+                CombatTarget combatTarget = hit.transform.GetComponent<CombatTarget>();
+                if (!CanAttack(combatTarget)) continue;
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    Attack(target);
+                    Attack(combatTarget);
                 }
                 return true;
             }
@@ -77,18 +82,32 @@ namespace RPG.Combat
         private void Attack(CombatTarget combatTarget)
         {
             actionScheduler.StartAction(this);
-            this.target = combatTarget.transform;
+            this.target = combatTarget.GetComponent<Health>();
         }
 
         public void Cancel()
         {
+            animator.SetTrigger("stopAttack");
             target = null;
         }
 
         // Animation Event
         void Hit()
         {
+            if (target == null) return;
+            target.TakeDamage(weaponDamage);
             Debug.Log("Just a scratch");
+            if (target.IsDead())
+            {
+                Cancel();
+            }
+        }
+
+        public bool CanAttack(CombatTarget combatTarget)
+        {
+            if (combatTarget == null) return false;
+            Health targetToTest = combatTarget.GetComponent<Health>();
+            return targetToTest != null && !targetToTest.IsDead();
         }
     }
 }
