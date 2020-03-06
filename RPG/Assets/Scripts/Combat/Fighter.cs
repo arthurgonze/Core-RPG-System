@@ -54,6 +54,7 @@ namespace RPG.Combat
         private void AttackBehaviour()
         {
             this.transform.LookAt(target.transform);
+            animator.ResetTrigger("stopAttack");
             animator.SetTrigger("attack");
         }
 
@@ -87,6 +88,7 @@ namespace RPG.Combat
 
         public void Cancel()
         {
+            animator.ResetTrigger("attack");
             animator.SetTrigger("stopAttack");
             target = null;
         }
