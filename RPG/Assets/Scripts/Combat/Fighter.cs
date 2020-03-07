@@ -11,7 +11,7 @@ namespace RPG.Combat
         [SerializeField] private float timeBetweenAttacks = 1f;
         [SerializeField] private float weaponDamage = 10f;
 
-        private float timeSinceLastAttack = 0;
+        private float timeSinceLastAttack = Mathf.Infinity;
 
         private Health target;
 
@@ -69,19 +69,22 @@ namespace RPG.Combat
             foreach (RaycastHit hit in hits)
             {
                 CombatTarget combatTarget = hit.transform.GetComponent<CombatTarget>();
-                if (!CanAttack(combatTarget)) continue;
+                if (combatTarget == null) continue;
+
+                if (!CanAttack(combatTarget.gameObject)) continue;
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    Attack(combatTarget);
+                    Attack(combatTarget.gameObject);
                 }
                 return true;
             }
             return false;
         }
 
-        private void Attack(CombatTarget combatTarget)
+        public void Attack(GameObject combatTarget)
         {
+            if (combatTarget == null) return;
             actionScheduler.StartAction(this);
             this.target = combatTarget.GetComponent<Health>();
         }
@@ -105,7 +108,7 @@ namespace RPG.Combat
             }
         }
 
-        public bool CanAttack(CombatTarget combatTarget)
+        public bool CanAttack(GameObject combatTarget)
         {
             if (combatTarget == null) return false;
             Health targetToTest = combatTarget.GetComponent<Health>();

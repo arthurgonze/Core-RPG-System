@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
-namespace RPG.Combat
+namespace RPG.Core
 {
     public class Health : MonoBehaviour
     {
@@ -20,19 +21,23 @@ namespace RPG.Combat
         {
             healthPoints = Mathf.Max(healthPoints - damage, 0);
             Debug.Log(healthPoints);
-            if(healthPoints <= 0 && !isDead)
+            if (healthPoints <= 0 && !isDead)
             {
-                animator.SetTrigger("die");
-
-                Collider collider = this.GetComponent<Collider>();
-                if (collider)
-                {
-                    collider.enabled = false;
-                }
-
-                isDead = true;
+                Die();
             }
         }
+
+        private void Die()
+        {
+            if (isDead) return;
+
+            isDead = true;
+            animator.SetTrigger("die");
+            GetComponent<ActionScheduler>().CancelCurrentAction();
+            if (this.GetComponent<NavMeshAgent>()) { this.GetComponent<NavMeshAgent>().enabled = false; }
+            //if (this.GetComponent<Collider>()) { this.GetComponent<Collider>().enabled = false; }
+        }
+
         public bool IsDead()
         {
             return isDead;
