@@ -8,6 +8,7 @@ namespace RPG.Movement
     {
         // We can remove the serializeField, its on just for debug purposes
         [SerializeField] private Transform target;
+        [SerializeField] float maxSpeed = 6f;
 
         // Cached References
         private NavMeshAgent navMeshAgent;
@@ -48,22 +49,23 @@ namespace RPG.Movement
                 //Debug.DrawRay(ray.origin, ray.direction * 100, Color.red);
                 if (Input.GetMouseButton(0))
                 {
-                    StartMovementAction(hit.point);
+                    StartMovementAction(hit.point, 1f);
                 }
                 return true;
             }
             return false;
         }
 
-        private void StartMovementAction(Vector3 destination)
+        public void StartMovementAction(Vector3 destination, float speedFraction)
         {
             actionScheduler.StartAction(this);
-            MoveTo(destination);
+            MoveTo(destination, speedFraction);
         }
 
-        public void MoveTo(Vector3 destination)
+        public void MoveTo(Vector3 destination, float speedFraction)
         {
             navMeshAgent.SetDestination(destination);
+            navMeshAgent.speed = maxSpeed * Mathf.Clamp01(speedFraction);
             navMeshAgent.isStopped = false;
         }
 
