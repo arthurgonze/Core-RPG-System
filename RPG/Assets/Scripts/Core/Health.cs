@@ -1,27 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using RPG.Saving;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace RPG.Core
 {
-    public class Health : MonoBehaviour
+    public class Health : MonoBehaviour, ISavable
     {
-        [SerializeField] float healthPoints = 100f;
+        [SerializeField] private float _healthPoints = 100f;
 
-        private Animator animator;
+        private bool _isDead = false;
 
-        bool isDead = false;
-
-        private void Start()
-        {
-            animator = this.GetComponent<Animator>();
-        }
         public void TakeDamage(float damage)
         {
-            healthPoints = Mathf.Max(healthPoints - damage, 0);
-            Debug.Log(healthPoints);
-            if (healthPoints <= 0 && !isDead)
+            _healthPoints = Mathf.Max(_healthPoints - damage, 0);
+            if (_healthPoints <= 0)
             {
                 Die();
             }
@@ -29,18 +20,30 @@ namespace RPG.Core
 
         private void Die()
         {
-            if (isDead) return;
+            if (_isDead) return;
 
-            isDead = true;
-            animator.SetTrigger("die");
+            _isDead = true;
+            this.GetComponent<Animator>().SetTrigger("die");
             GetComponent<ActionScheduler>().CancelCurrentAction();
-            if (this.GetComponent<NavMeshAgent>()) { this.GetComponent<NavMeshAgent>().enabled = false; }
-            //if (this.GetComponent<Collider>()) { this.GetComponent<Collider>().enabled = false; }
         }
 
         public bool IsDead()
         {
-            return isDead;
+            return _isDead;
+        }
+
+        public object CaptureState()
+        {
+            return this._healthPoints;
+        }
+
+        public void RestoreState(object state)
+        {
+            this._healthPoints = (float) state;
+            if (this._healthPoints <= 0)
+            {
+                Die();
+            }
         }
     }
 }

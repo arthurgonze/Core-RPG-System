@@ -7,60 +7,61 @@ namespace RPG.Combat
 {
     public class Fighter : MonoBehaviour, IAction
     {
-        [SerializeField] private float weaponRange = 2f;
-        [SerializeField] private float timeBetweenAttacks = 1f;
-        [SerializeField] private float weaponDamage = 10f;
+        [SerializeField] private float _weaponRange = 2f;
+        [SerializeField] private float _timeBetweenAttacks = 1f;
+        [SerializeField] private float _weaponDamage = 10f;
 
-        private float timeSinceLastAttack = Mathf.Infinity;
+        private float _timeSinceLastAttack = Mathf.Infinity;
 
-        private Health target;
+        private Health _target;
 
-        private ActionScheduler actionScheduler;
-        private Animator animator;
-        private Mover mover;
-        void Start()
+        private ActionScheduler _actionScheduler;
+        private Animator _animator;
+        private Mover _mover;
+
+        private void Start()
         {
-            actionScheduler = GetComponent<ActionScheduler>();
-            animator = GetComponent<Animator>();
-            mover = GetComponent<Mover>();
+            _actionScheduler = GetComponent<ActionScheduler>();
+            _animator = GetComponent<Animator>();
+            _mover = GetComponent<Mover>();
         }
 
         private void Update()
         {
-            timeSinceLastAttack += Time.deltaTime;
+            _timeSinceLastAttack += Time.deltaTime;
             MoveToAttack();
         }
 
         private void MoveToAttack()
         {
-            if (target == null) return;
+            if (_target == null) return;
             
             if (!GetIsInRange())
             {
-                mover.MoveTo(target.transform.position, 1f);
+                _mover.MoveTo(_target.transform.position, 1f);
             }
             else
             {
-                mover.Cancel();
+                _mover.Cancel();
 
-                if (timeSinceLastAttack > timeBetweenAttacks)
+                if (_timeSinceLastAttack > _timeBetweenAttacks)
                 {
                     AttackBehaviour();
-                    timeSinceLastAttack = 0;
+                    _timeSinceLastAttack = 0;
                 }
             }
         }
 
         private void AttackBehaviour()
         {
-            this.transform.LookAt(target.transform);
-            animator.ResetTrigger("stopAttack");
-            animator.SetTrigger("attack");
+            this.transform.LookAt(_target.transform);
+            _animator.ResetTrigger("stopAttack");
+            _animator.SetTrigger("attack");
         }
 
         private bool GetIsInRange()
         {
-            return Vector3.Distance(transform.position, target.transform.position) < weaponRange;
+            return Vector3.Distance(transform.position, _target.transform.position) < _weaponRange;
         }
 
         public bool PlayerAttack()
@@ -85,25 +86,25 @@ namespace RPG.Combat
         public void Attack(GameObject combatTarget)
         {
             if (combatTarget == null) return;
-            actionScheduler.StartAction(this);
-            this.target = combatTarget.GetComponent<Health>();
+            _actionScheduler.StartAction(this);
+            this._target = combatTarget.GetComponent<Health>();
         }
 
         public void Cancel()
         {
-            animator.ResetTrigger("attack");
-            animator.SetTrigger("stopAttack");
-            target = null;
-            mover.Cancel();
+            _animator.ResetTrigger("attack");
+            _animator.SetTrigger("stopAttack");
+            _target = null;
+            _mover.Cancel();
         }
 
         // Animation Event
-        void Hit()
+        private void Hit()
         {
-            if (target == null) return;
-            target.TakeDamage(weaponDamage);
-            Debug.Log("Just a scratch");
-            if (target.IsDead())
+            if (_target == null) return;
+            _target.TakeDamage(_weaponDamage);
+            //Debug.Log("Just a scratch");
+            if (_target.IsDead())
             {
                 Cancel();
             }

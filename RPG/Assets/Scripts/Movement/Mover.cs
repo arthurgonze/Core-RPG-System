@@ -1,55 +1,56 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 using RPG.Core;
+using RPG.Saving;
 
 namespace RPG.Movement
 {
-    public class Mover : MonoBehaviour, IAction
+    public class Mover : MonoBehaviour, IAction, ISavable
     {
         // We can remove the serializeField, its on just for debug purposes
-        [SerializeField] private Transform target;
-        [SerializeField] float maxSpeed = 6f;
+        [SerializeField] private Transform _target;
+        [SerializeField] private float _maxSpeed = 6f;
 
         // Cached References
-        private NavMeshAgent navMeshAgent;
-        private Animator animator;
-        private ActionScheduler actionScheduler;
+        private NavMeshAgent _navMeshAgent;
+        private Animator _animator;
+        private ActionScheduler _actionScheduler;
 
         // Move to Cursor
-        private Ray ray;
-        private bool hasHit = false;
-        private RaycastHit hit;
+        private Ray _ray;
+        private bool _hasHit = false;
+        private RaycastHit _hit;
 
         // Update Animator
-        private Vector3 globalVelocity;
-        private Vector3 localVelocity;
-        private float speed;
+        private Vector3 _globalVelocity;
+        private Vector3 _localVelocity;
+        private float _speed;
 
 
         // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
-            navMeshAgent = GetComponent<NavMeshAgent>();
-            animator = GetComponent<Animator>();
-            actionScheduler = GetComponent<ActionScheduler>();
+            _navMeshAgent = GetComponent<NavMeshAgent>();
+            _animator = GetComponent<Animator>();
+            _actionScheduler = GetComponent<ActionScheduler>();
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
             UpdateAnimator();
         }
 
         public bool MoveToCursor()
         {
-            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            hasHit = Physics.Raycast(ray, out hit);
-            if (hasHit)
+            _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            _hasHit = Physics.Raycast(_ray, out _hit);
+            if (_hasHit)
             {
                 //Debug.DrawRay(ray.origin, ray.direction * 100, Color.red);
                 if (Input.GetMouseButton(0))
                 {
-                    StartMovementAction(hit.point, 1f);
+                    StartMovementAction(_hit.point, 1f);
                 }
                 return true;
             }
@@ -58,28 +59,54 @@ namespace RPG.Movement
 
         public void StartMovementAction(Vector3 destination, float speedFraction)
         {
-            actionScheduler.StartAction(this);
+            _actionScheduler.StartAction(this);
             MoveTo(destination, speedFraction);
         }
 
         public void MoveTo(Vector3 destination, float speedFraction)
         {
-            navMeshAgent.SetDestination(destination);
-            navMeshAgent.speed = maxSpeed * Mathf.Clamp01(speedFraction);
-            navMeshAgent.isStopped = false;
+            _navMeshAgent.SetDestination(destination);
+            _navMeshAgent.speed = _maxSpeed * Mathf.Clamp01(speedFraction);
+            _navMeshAgent.isStopped = false;
         }
 
         private void UpdateAnimator()
         {
-            globalVelocity = navMeshAgent.velocity;
-            localVelocity = transform.InverseTransformDirection(globalVelocity);
-            speed = localVelocity.z;
-            animator.SetFloat("ForwardSpeed", speed);
+            _globalVelocity = _navMeshAgent.velocity;
+            _localVelocity = transform.InverseTransformDirection(_globalVelocity);
+            _speed = _localVelocity.z;
+            _animator.SetFloat("ForwardSpeed", _speed);
         }
 
         public void Cancel()
         {
-            navMeshAgent.isStopped = true;
+            _navMeshAgent.isStopped = true;
+        }
+
+        public object CaptureState()
+        {
+            return new SerializableVector3(transform.position);
+        }
+
+        public void RestoreState(object state)
+        {
+            SerializableVector3 position = (SerializableVector3)state;
+
+            if (this.GetComponent<NavMeshAgent>() != null)
+            {
+                this.GetComponent<NavMeshAgent>().enabled = false;
+                this.transform.position = position.ToVector();
+                this.GetComponent<NavMeshAgent>().enabled = true;
+            }
+            else
+            {
+                this.transform.position = position.ToVector();
+            }
+
+            if (this.GetComponent<ActionScheduler>() != null)
+            {
+                this.GetComponent<ActionScheduler>().CancelCurrentAction();
+            }
         }
     }
 }

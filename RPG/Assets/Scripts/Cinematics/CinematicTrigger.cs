@@ -8,16 +8,16 @@ namespace RPG.Cinematics
 {
     public class CinematicTrigger : MonoBehaviour
     {
-        private bool alreadyTriggered = false;
-        public event Action onStart;
-        public event Action onFinish;
+        private bool _alreadyTriggered = false;
+        // public event Action onStart;
+        // public event Action onFinish;
 
         private void OnTriggerEnter(Collider other)
         {
-            if(other.tag.Equals("Player") && !alreadyTriggered)
+            if(other.tag.Equals("Player") && !_alreadyTriggered)
             {
                 GetComponent<PlayableDirector>().Play();
-                alreadyTriggered = true;
+                _alreadyTriggered = true;
             }
         }
     }
