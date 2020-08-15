@@ -7,14 +7,14 @@ namespace RPG.Combat
 {
     public class Fighter : MonoBehaviour, IAction
     {
-        [SerializeField] private float _weaponRange = 2f;
         [SerializeField] private float _timeBetweenAttacks = 1f;
-        [SerializeField] private float _weaponDamage = 10f;
-        [SerializeField] private GameObject _weaponPrefab = null;
         [SerializeField] private Transform _rightHandTransform = null;
+        [SerializeField] private Weapon _defaultWeapon = null;
+        [SerializeField] private Weapon _currentWeapon = null;
 
         private float _timeSinceLastAttack = Mathf.Infinity;
         private Health _target;
+        
 
         // Cached reference
         private ActionScheduler _actionScheduler;
@@ -30,7 +30,7 @@ namespace RPG.Combat
 
         private void Start()
         {
-            SpawnWeapon();
+            EquipWeapon(_defaultWeapon);
         }
 
         private void Update()
@@ -39,9 +39,12 @@ namespace RPG.Combat
             MoveToAttack();
         }
 
-        private void SpawnWeapon()
+        public void EquipWeapon(Weapon weapon)
         {
-            Instantiate(_weaponPrefab, _rightHandTransform);
+            if (weapon == null) return;
+            _currentWeapon = weapon;
+            Animator animator = GetComponent<Animator>();
+            weapon.Spawn(_rightHandTransform, animator);
         }
 
         private void MoveToAttack()
@@ -73,7 +76,7 @@ namespace RPG.Combat
 
         private bool GetIsInRange()
         {
-            return Vector3.Distance(transform.position, _target.transform.position) < _weaponRange;
+            return Vector3.Distance(transform.position, _target.transform.position) < _currentWeapon.GetWeaponRange();
         }
 
         public bool PlayerAttack()
@@ -114,7 +117,7 @@ namespace RPG.Combat
         private void Hit()
         {
             if (_target == null) return;
-            _target.TakeDamage(_weaponDamage);
+            _target.TakeDamage(_currentWeapon.GetWeaponDamage());
             //Debug.Log("Just a scratch");
             if (_target.IsDead())
             {

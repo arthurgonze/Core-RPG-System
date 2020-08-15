@@ -8,7 +8,7 @@ using System;
 
 namespace RPG.Control
 {
-    public class AiController : MonoBehaviour
+    public class AIController : MonoBehaviour
     {
         [SerializeField] private float _chaseDistance = 5f;
         [SerializeField] private float _suspicionTime = 3f;
