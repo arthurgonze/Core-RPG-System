@@ -9,6 +9,8 @@ namespace RPG.SceneManagement
         [SerializeField] private float _timeToFadeIn = .5f; 
 
         private const string DefaultSaveFile = "save";
+
+        // Cached reference
         private SavingSystem _savingSystem;
 
         private void Awake()

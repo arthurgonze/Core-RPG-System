@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.AI;
 using RPG.Core;
 using RPG.Saving;
@@ -28,7 +29,7 @@ namespace RPG.Movement
 
 
         // Start is called before the first frame update
-        private void Start()
+        private void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _animator = GetComponent<Animator>();
@@ -85,22 +86,27 @@ namespace RPG.Movement
 
         public object CaptureState()
         {
-            return new SerializableVector3(transform.position);
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data["position"] = new SerializableVector3(transform.position);
+            data["rotation"] = new SerializableVector3(transform.eulerAngles);
+            return data;
         }
 
         public void RestoreState(object state)
         {
-            SerializableVector3 position = (SerializableVector3)state;
+            Dictionary<string, object> data = (Dictionary<string, object>)state;
 
             if (this.GetComponent<NavMeshAgent>() != null)
             {
                 this.GetComponent<NavMeshAgent>().enabled = false;
-                this.transform.position = position.ToVector();
+                this.transform.position = ((SerializableVector3) data["position"]).ToVector();
+                this.transform.eulerAngles = ((SerializableVector3) data["rotation"]).ToVector();
                 this.GetComponent<NavMeshAgent>().enabled = true;
             }
             else
             {
-                this.transform.position = position.ToVector();
+                this.transform.position = ((SerializableVector3)data["position"]).ToVector();
+                this.transform.eulerAngles = ((SerializableVector3)data["rotation"]).ToVector();
             }
 
             if (this.GetComponent<ActionScheduler>() != null)

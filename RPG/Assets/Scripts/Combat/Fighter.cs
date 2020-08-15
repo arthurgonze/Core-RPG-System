@@ -10,26 +10,38 @@ namespace RPG.Combat
         [SerializeField] private float _weaponRange = 2f;
         [SerializeField] private float _timeBetweenAttacks = 1f;
         [SerializeField] private float _weaponDamage = 10f;
+        [SerializeField] private GameObject _weaponPrefab = null;
+        [SerializeField] private Transform _rightHandTransform = null;
 
         private float _timeSinceLastAttack = Mathf.Infinity;
-
         private Health _target;
 
+        // Cached reference
         private ActionScheduler _actionScheduler;
         private Animator _animator;
         private Mover _mover;
 
-        private void Start()
+        private void Awake()
         {
             _actionScheduler = GetComponent<ActionScheduler>();
             _animator = GetComponent<Animator>();
             _mover = GetComponent<Mover>();
         }
 
+        private void Start()
+        {
+            SpawnWeapon();
+        }
+
         private void Update()
         {
             _timeSinceLastAttack += Time.deltaTime;
             MoveToAttack();
+        }
+
+        private void SpawnWeapon()
+        {
+            Instantiate(_weaponPrefab, _rightHandTransform);
         }
 
         private void MoveToAttack()

@@ -7,11 +7,13 @@ namespace RPG.Control
 {
     public class PlayerController : MonoBehaviour
     {
+        // Cached Reference
         private Mover _mover;
         private Fighter _fighter;
         private Health _health;
+
         // Start is called before the first frame update
-        private void Start()
+        private void Awake()
         {
             _mover = GetComponent<Mover>();
             _fighter = GetComponent<Fighter>();
