@@ -6,8 +6,14 @@ namespace RPG.Core
     public class Health : MonoBehaviour, ISavable
     {
         [SerializeField] private float _healthPoints = 100f;
+        [SerializeField] private bool _die = false;
 
         private bool _isDead = false;
+
+        public void Update()
+        {
+            if (_die) Die();
+        }
 
         public void TakeDamage(float damage)
         {
@@ -25,6 +31,7 @@ namespace RPG.Core
             _isDead = true;
             this.GetComponent<Animator>().SetTrigger("die");
             GetComponent<ActionScheduler>().CancelCurrentAction();
+            GetComponent<Collider>().enabled = false;
         }
 
         public bool IsDead()

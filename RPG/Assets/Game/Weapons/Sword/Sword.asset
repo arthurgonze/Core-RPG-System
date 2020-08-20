@@ -17,3 +17,4 @@ MonoBehaviour:
   _equippedWeaponPrefab: {fileID: 7808996388725229198, guid: 95fc25d00ca63fb458f01eafc7732b75,
     type: 3}
   _animatorOverride: {fileID: 22100000, guid: 0b94795148867e1438f3f349d11ffc89, type: 2}
+  _isRightHand: 1

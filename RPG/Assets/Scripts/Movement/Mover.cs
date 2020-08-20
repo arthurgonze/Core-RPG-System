@@ -9,8 +9,8 @@ namespace RPG.Movement
     public class Mover : MonoBehaviour, IAction, ISavable
     {
         // We can remove the serializeField, its on just for debug purposes
-        [SerializeField] private Transform _target;
         [SerializeField] private float _maxSpeed = 6f;
+        private Transform _target;
 
         // Cached References
         private NavMeshAgent _navMeshAgent;
