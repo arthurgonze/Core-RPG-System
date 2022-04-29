@@ -3,69 +3,75 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using RPG.Core;
 using UnityEngine;
+using RPG.Attributes;
 
 namespace RPG.Combat
 {
     public class Projectile : MonoBehaviour
     {
-        [SerializeField] private float _projectileSpeed = 1f;
-        [SerializeField] private bool _isHoming = false;
-        [SerializeField] private float _targetPositionOffset = 0.1f;
-        [SerializeField] private float _lifetime = 1f;
-        private float _damage = 0;
-        private Health _target = null;
-        private Vector3 _initialTargetPosition;
-        private float _timeSinceLaunch = Mathf.Infinity;
+        [SerializeField] private float _speed = 1;
+        [SerializeField] private bool _isHoming = true;
+        [SerializeField] private GameObject _hitEffect = null;
+        [SerializeField] private float _maxLifetime = 5f;
+        [SerializeField] private float _lifeAfterImpact = 2f;
+        [SerializeField] private GameObject[] _destroyOnHit = null;
 
-        // Update is called once per frame
+        private Health _target = null;
+        private GameObject _instigator = null;
+        private float _damage = 0;
+
+        private void Start()
+        {
+            transform.LookAt(GetAimLocation());
+        }
+
         void Update()
         {
-            _timeSinceLaunch += Time.deltaTime;
             if (_target == null) return;
-            if(IsInTargetsPosition() || (_timeSinceLaunch > _lifetime))
-                Destroy(gameObject);
-            ProjectileBehavior();
+            if (_isHoming && !_target.IsDead())
+                transform.LookAt(GetAimLocation());
+            
+            transform.Translate(Vector3.forward * _speed * Time.deltaTime);
         }
 
-        private bool IsInTargetsPosition()
-        {
-            return Vector3.Distance(transform.position, _target.transform.position) < _targetPositionOffset;
-        }
-
-        public void SetTarget(Health target, float damage)
+        public void SetTarget(Health target, GameObject instigator, float damage)
         {
             this._target = target;
             this._damage = damage;
-            _initialTargetPosition = GetAimLocation();
-            _timeSinceLaunch = 0;
-        }
+            this._instigator = instigator;
 
-        private void ProjectileBehavior()
-        {
-            if(_isHoming) transform.LookAt(GetAimLocation());
-            else transform.LookAt(_initialTargetPosition);
-            transform.Translate(Vector3.forward * Time.deltaTime * _projectileSpeed);
+            Destroy(gameObject, _maxLifetime);
         }
 
         private Vector3 GetAimLocation()
         {
-            CapsuleCollider targetCollider = _target.GetComponent<CapsuleCollider>();
-            if (targetCollider != null && targetCollider.enabled)
+            CapsuleCollider targetCapsule = _target.GetComponent<CapsuleCollider>();
+            if (targetCapsule == null)
             {
-                return _target.transform.position + (Vector3.up * (targetCollider.height / 2));
+                return _target.transform.position;
             }
-           
-            return _target.transform.position;
+            return _target.transform.position + Vector3.up * targetCapsule.height / 2;
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject == _target.gameObject)
+            if (other.GetComponent<Health>() != _target) return;
+            if (_target.IsDead()) return;
+            _target.TakeDamage(_instigator, _damage);
+
+            _speed = 0;
+
+            if (_hitEffect != null)
             {
-                _target.TakeDamage(_damage);
+                Instantiate(_hitEffect, GetAimLocation(), transform.rotation);
             }
 
-            Destroy(gameObject);
+            foreach (GameObject toDestroy in _destroyOnHit)
+            {
+                Destroy(toDestroy);
+            }
+
+            Destroy(gameObject, _lifeAfterImpact);
         }
     }
 }

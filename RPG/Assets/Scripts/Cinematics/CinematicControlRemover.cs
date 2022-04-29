@@ -10,14 +10,27 @@ namespace RPG.Cinematics
         // Cached reference
         private GameObject _player;
 
+        PlayableDirector _playableDirector;
         private void Awake()
         {
-            GetComponent<PlayableDirector>().played += DisablePlayerControl;
-            GetComponent<PlayableDirector>().stopped += EnablePlayerControl;
-        }
-        private void Start()
-        {
+            _playableDirector = GetComponent<PlayableDirector>();
             _player = GameObject.FindWithTag("Player");
+        }
+
+        // private void Start()
+        // {
+        //     _player = GameObject.FindWithTag("Player");
+        // }
+
+        private void OnEnable()
+        {
+            _playableDirector.played += DisablePlayerControl;
+            _playableDirector.stopped += EnablePlayerControl;
+        }
+
+        private void OnDisable() {
+            _playableDirector.played -= DisablePlayerControl;
+            _playableDirector.stopped -= EnablePlayerControl;
         }
 
         private void DisablePlayerControl(PlayableDirector playableDirector)

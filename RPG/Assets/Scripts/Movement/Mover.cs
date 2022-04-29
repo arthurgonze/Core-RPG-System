@@ -96,12 +96,12 @@ namespace RPG.Movement
         {
             Dictionary<string, object> data = (Dictionary<string, object>)state;
 
-            if (this.GetComponent<NavMeshAgent>() != null)
+            if (_navMeshAgent != null)
             {
-                this.GetComponent<NavMeshAgent>().enabled = false;
+                _navMeshAgent.enabled = false;
                 this.transform.position = ((SerializableVector3) data["position"]).ToVector();
                 this.transform.eulerAngles = ((SerializableVector3) data["rotation"]).ToVector();
-                this.GetComponent<NavMeshAgent>().enabled = true;
+                _navMeshAgent.enabled = true;
             }
             else
             {
@@ -109,10 +109,8 @@ namespace RPG.Movement
                 this.transform.eulerAngles = ((SerializableVector3)data["rotation"]).ToVector();
             }
 
-            if (this.GetComponent<ActionScheduler>() != null)
-            {
-                this.GetComponent<ActionScheduler>().CancelCurrentAction();
-            }
+            if (_actionScheduler != null)
+                _actionScheduler.CancelCurrentAction();
         }
     }
 }

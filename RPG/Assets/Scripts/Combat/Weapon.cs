@@ -1,5 +1,6 @@
 ﻿using RPG.Core;
 using UnityEngine;
+using RPG.Attributes;
 
 namespace RPG.Combat
 {
@@ -8,11 +9,12 @@ namespace RPG.Combat
     {
         [SerializeField] private float _weaponRange = 2f;
         [SerializeField] private float _weaponDamage = 10f;
+        [SerializeField] private float _weaponPercentageDamage = 10;
         [SerializeField] private bool _isRightHand = true;
         [SerializeField] private GameObject _equippedWeaponPrefab = null;
         [SerializeField] private Projectile _projectile = null;
         [SerializeField] private AnimatorOverrideController _animatorOverride = null;
-        private const string weaponName = "Weapon"; 
+        private const string weaponName = "Weapon";
 
         public void Spawn(Transform rightHand, Transform leftHand, Animator animator)
         {
@@ -23,9 +25,12 @@ namespace RPG.Combat
                 GameObject weapon = Instantiate(_equippedWeaponPrefab, GetHandTransform(rightHand, leftHand));
                 weapon.name = weaponName;
             }
-            
+
+            var overrideController =  animator.runtimeAnimatorController as AnimatorOverrideController;
             if (_animatorOverride != null)
                 animator.runtimeAnimatorController = _animatorOverride;
+            else if(overrideController != null)
+                animator.runtimeAnimatorController = overrideController.runtimeAnimatorController;
         }
 
         private void DestroyOldWeapon(Transform rightHand, Transform leftHand)
@@ -46,13 +51,14 @@ namespace RPG.Combat
             return _isRightHand ? rightHand : leftHand;
         }
 
-        public void LaunchProjectile(Transform rightHand, Transform leftHand, Health target)
+        public void LaunchProjectile(Transform rightHand, Transform leftHand, Health target, GameObject instigator, float damage)
         {
             Projectile projectileInstance = Instantiate(_projectile, GetHandTransform(rightHand, leftHand).position, Quaternion.identity);
-            projectileInstance.SetTarget(target, _weaponDamage);
+            projectileInstance.SetTarget(target, instigator, damage);
         }
         public bool HasProjectile() { return _projectile != null; }
         public float GetWeaponRange() { return _weaponRange; }
         public float GetWeaponDamage() { return _weaponDamage; }
+        public float GetWeaponPercentageDamageBonus() { return _weaponPercentageDamage; }
     }
 }

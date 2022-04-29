@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 3295464479269265798}
   - component: {fileID: 778845080459781957}
   - component: {fileID: 4567186187599727182}
+  - component: {fileID: 5675134194631579218}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -54,6 +55,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -78,6 +80,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!195 &3295464479269265800
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -147,7 +150,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f517d847712990741afeb497ae67fba5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _target: {fileID: 0}
   _maxSpeed: 6
 --- !u!114 &3295464479269265801
 MonoBehaviour:
@@ -162,8 +164,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _timeBetweenAttacks: 1
-  _defaultWeapon: {fileID: 0}
   _rightHandTransform: {fileID: 0}
+  _leftHandTransform: {fileID: 0}
+  _defaultWeapon: {fileID: 0}
+  _currentWeapon: {fileID: 0}
 --- !u!114 &3295464479269265798
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,7 +192,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc25e10b5ae85f84d9f2fe2cff5d9154, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _healthPoints: 100
+  _healthPoints: -1
+  _die: 0
 --- !u!114 &4567186187599727182
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,3 +207,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _uniqueIdentifier: 
+--- !u!114 &5675134194631579218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3295464479269265806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f89a2bea70969a4491a0efc2e2c903a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _startingLevel: 1
+  _characterClass: 0
+  _progression: {fileID: 11400000, guid: 99096d2c36531334f882ae00e26d953c, type: 2}
+  _levelUpParticleEffect: {fileID: 0}

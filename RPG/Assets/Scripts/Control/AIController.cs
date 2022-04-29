@@ -4,7 +4,9 @@ using UnityEngine;
 using RPG.Combat;
 using RPG.Core;
 using RPG.Movement;
+using RPG.Attributes;
 using System;
+using GameDevTV.Utils;
 
 namespace RPG.Control
 {
@@ -25,7 +27,7 @@ namespace RPG.Control
         private Mover _mover;
 
         // Patrol Behavior
-        private Vector3 _guardPosition;
+        private LazyValue<Vector3> _guardPosition;
         private float _timeSinceLastSawPlayer = Mathf.Infinity;
         private float _timeSinceEnteringWaypoint = Mathf.Infinity;
 
@@ -35,12 +37,13 @@ namespace RPG.Control
             _fighter = this.GetComponent<Fighter>();
             _health = this.GetComponent<Health>();
             _mover = this.GetComponent<Mover>();
+            _player = GameObject.FindWithTag("Player");
+            _guardPosition = new LazyValue<Vector3>(GetInitialGuardPosition);
         }
 
         private void Start()
         {
-            _player = GameObject.FindWithTag("Player");
-            _guardPosition = this.transform.position;
+            _guardPosition.ForceInit();
         }
 
         private void Update()
@@ -48,19 +51,18 @@ namespace RPG.Control
             if (_health.IsDead()) return;
 
             if (DistanceToPlayer() < _chaseDistance && _fighter.CanAttack(_player))
-            {
                 AttackBehaviour();
-            }
             else if (_timeSinceLastSawPlayer < _suspicionTime)
-            {
                 SuspicionBehaviour();
-            }
             else
-            {
                 PatrolBehaviour();
-            }
-
+            
             UpdateTimers();
+        }
+
+        private Vector3 GetInitialGuardPosition()
+        {
+            return this.transform.position;
         }
 
         private void AttackBehaviour()
@@ -82,7 +84,7 @@ namespace RPG.Control
 
         private void PatrolBehaviour()
         {
-            Vector3 nextPosition = _guardPosition;
+            Vector3 nextPosition = _guardPosition.value;
 
             if(_patrolPath != null)
             {

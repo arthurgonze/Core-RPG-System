@@ -23,9 +23,7 @@ namespace RPG.SceneManagement
         private void OnTriggerEnter(Collider other)
         {
             if (other.tag == "Player")
-            {
                 StartCoroutine(Transition());
-            }
         }
          
         private IEnumerator Transition()

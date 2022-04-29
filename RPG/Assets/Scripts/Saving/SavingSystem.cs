@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -12,14 +13,12 @@ namespace RPG.Saving
         public IEnumerator LoadLastScene(string saveFile)
         {
             Dictionary<string, object> state = LoadFile(saveFile);
+            int buildIndex = SceneManager.GetActiveScene().buildIndex;
+            
             if (state.ContainsKey("lastSceneBuildIndex"))
-            {
-                int buildIndex = (int) state["lastSceneBuildIndex"];
-                
-                if (buildIndex != SceneManager.GetActiveScene().buildIndex)
-                    yield return SceneManager.LoadSceneAsync(buildIndex);
-            }
-
+                buildIndex = (int) state["lastSceneBuildIndex"];
+            
+            yield return SceneManager.LoadSceneAsync(buildIndex);
             RestoreState(state);
         }
 
@@ -35,10 +34,23 @@ namespace RPG.Saving
             RestoreState(LoadFile(saveFile));
         }
 
+        public void Delete(string saveFile)
+        {
+            DeleteFile(saveFile);
+        }
+
+        private void DeleteFile(string saveFile)
+        {
+            string path = GetPathFromSaveFile(saveFile);
+            print("Deleting: " + path);
+            // if(File.Exists(saveFile))
+            File.Delete(saveFile);
+        }
+
         private Dictionary<string, object> LoadFile(string saveFile)
         {
             string path = GetPathFromSaveFile(saveFile);
-
+            print("Loading: " + path);
             if (!File.Exists(path)) 
                 return new Dictionary<string, object>();
             
@@ -75,9 +87,7 @@ namespace RPG.Saving
         private void CaptureState(Dictionary<string, object> state)
         { 
             foreach (SavableEntity savable in FindObjectsOfType<SavableEntity>())
-            {
                 state[savable.GetUniqueIdentifier()] = savable.CaptureState();
-            }
 
             state["lastSceneBuildIndex"] = SceneManager.GetActiveScene().buildIndex;
         }

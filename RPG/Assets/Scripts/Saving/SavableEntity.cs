@@ -22,9 +22,7 @@ namespace RPG.Saving
         {
             Dictionary<string, object> state = new Dictionary<string, object>();
             foreach (ISavable savable in GetComponents<ISavable>())
-            {
                 state[savable.GetType().ToString()] = savable.CaptureState();
-            }
 
             return state;
         }
