@@ -2407,6 +2407,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d254f599d67297143a521bf30023e492, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maxNavMeshSampleDistance: 1
+  _maxNavPathDistance: 20
+  _cursorMappings:
+  - type: 0
+    texture: {fileID: 2800000, guid: 21628736160fcc9488493401da3ef621, type: 3}
+    hotspot: {x: 0, y: 0}
+  - type: 1
+    texture: {fileID: 2800000, guid: 2e71a8202d3b4a3448ec85ced5a40265, type: 3}
+    hotspot: {x: 0, y: 0}
+  - type: 2
+    texture: {fileID: 2800000, guid: 2d18e23e3ce249b4489b8bcdd02d3f48, type: 3}
+    hotspot: {x: 0, y: 0}
 --- !u!114 &9207645277829481919
 MonoBehaviour:
   m_ObjectHideFlags: 0

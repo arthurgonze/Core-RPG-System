@@ -18,9 +18,9 @@ namespace RPG.Movement
         private ActionScheduler _actionScheduler;
 
         // Move to Cursor
-        private Ray _ray;
-        private bool _hasHit = false;
-        private RaycastHit _hit;
+        // private Ray _ray;
+        // private bool _hasHit = false;
+        // private RaycastHit _hit;
 
         // Update Animator
         private Vector3 _globalVelocity;
@@ -40,22 +40,6 @@ namespace RPG.Movement
         private void Update()
         {
             UpdateAnimator();
-        }
-
-        public bool MoveToCursor()
-        {
-            _ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            _hasHit = Physics.Raycast(_ray, out _hit);
-            if (_hasHit)
-            {
-                //Debug.DrawRay(ray.origin, ray.direction * 100, Color.red);
-                if (Input.GetMouseButton(0))
-                {
-                    StartMovementAction(_hit.point, 1f);
-                }
-                return true;
-            }
-            return false;
         }
 
         public void StartMovementAction(Vector3 destination, float speedFraction)

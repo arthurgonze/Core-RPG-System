@@ -95,24 +95,6 @@ namespace RPG.Combat
             return Vector3.Distance(transform.position, _target.transform.position) < _currentWeapon.value.GetWeaponRange();
         }
 
-        public bool PlayerAttack()
-        {
-            RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
-            foreach (RaycastHit hit in hits)
-            {
-                CombatTarget combatTarget = hit.transform.GetComponent<CombatTarget>();
-                if (combatTarget == null) continue;
-
-                if (!CanAttack(combatTarget.gameObject)) continue;
-
-                if (Input.GetMouseButton(0))
-                    Attack(combatTarget.gameObject);
-                
-                return true;
-            }
-            return false;
-        }
-
         public void Attack(GameObject combatTarget)
         {
             if (combatTarget == null) return;
