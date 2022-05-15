@@ -78,7 +78,12 @@ namespace RPG.Attributes
 
         public float GetPercentage()
         {
-            return 100 * (_healthPoints.value / GetMaxHealthPoints());
+            return 100 * GetFraction();
+        }
+
+        public float GetFraction()
+        {
+            return (_healthPoints.value / GetMaxHealthPoints());
         }
 
         private void Die()
