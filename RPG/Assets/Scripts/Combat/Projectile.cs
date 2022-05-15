@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using RPG.Core;
 using UnityEngine;
 using RPG.Attributes;
+using UnityEngine.Events;
 
 namespace RPG.Combat
 {
@@ -15,6 +16,7 @@ namespace RPG.Combat
         [SerializeField] private float _maxLifetime = 5f;
         [SerializeField] private float _lifeAfterImpact = 2f;
         [SerializeField] private GameObject[] _destroyOnHit = null;
+        [SerializeField] UnityEvent _onHit;   
 
         private Health _target = null;
         private GameObject _instigator = null;
@@ -57,19 +59,17 @@ namespace RPG.Combat
         {
             if (other.GetComponent<Health>() != _target) return;
             if (_target.IsDead()) return;
+            _onHit.Invoke();
             _target.TakeDamage(_instigator, _damage);
 
             _speed = 0;
 
+            // hit Projectile SFX
             if (_hitEffect != null)
-            {
                 Instantiate(_hitEffect, GetAimLocation(), transform.rotation);
-            }
 
             foreach (GameObject toDestroy in _destroyOnHit)
-            {
                 Destroy(toDestroy);
-            }
 
             Destroy(gameObject, _lifeAfterImpact);
         }

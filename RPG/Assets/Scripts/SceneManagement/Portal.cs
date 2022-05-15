@@ -3,6 +3,8 @@ using RPG.Saving;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.AI;
+using RPG.Core;
+using RPG.Control;
 
 namespace RPG.SceneManagement
 {
@@ -19,6 +21,12 @@ namespace RPG.SceneManagement
         [SerializeField] private float _fadeWaitTime = 0.5f;
         [SerializeField] private Transform _spawnPoint;
         [SerializeField] private DestinationIdentifier _destination;
+
+        GameObject _player = null;
+
+        private void Awake() {
+            _player = GameObject.FindGameObjectWithTag("Player");
+        }
 
         private void OnTriggerEnter(Collider other)
         {
@@ -37,8 +45,9 @@ namespace RPG.SceneManagement
 
             Fader fader = FindObjectOfType<Fader>();
             SavingWrapper savingWrapper = FindObjectOfType<SavingWrapper>();
+            TogglePlayerControl(false);
 
-            yield return fader.FadeOut(_fadeOutTime);
+            fader.FadeOut(_fadeOutTime);
             MovePlayerToSpawnPoint();
 
             savingWrapper.Save();
@@ -48,23 +57,25 @@ namespace RPG.SceneManagement
 
             Portal otherPortal = GetOtherPortal();
             UpdatePlayer(otherPortal);
+            TogglePlayerControl(false);
 
             savingWrapper.Save();
 
             yield return new WaitForSeconds(_fadeWaitTime);
-            yield return fader.FadeIn(_fadeInTime);
+            fader.FadeIn(_fadeInTime);
 
+            TogglePlayerControl(true);
             Destroy(this.gameObject);
         }
 
         private void UpdatePlayer(Portal otherPortal)
         {
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            _player = GameObject.FindGameObjectWithTag("Player");
             //player.GetComponent<NavMeshAgent>().Warp(otherPortal.spawnPoint.position);
-            player.GetComponent<NavMeshAgent>().enabled = false;
-            player.transform.position = otherPortal._spawnPoint.position;
-            player.transform.rotation = otherPortal._spawnPoint.rotation;
-            player.GetComponent<NavMeshAgent>().enabled = true;
+            _player.GetComponent<NavMeshAgent>().enabled = false;
+            _player.transform.position = otherPortal._spawnPoint.position;
+            _player.transform.rotation = otherPortal._spawnPoint.rotation;
+            _player.GetComponent<NavMeshAgent>().enabled = true;
         }
 
         private Portal GetOtherPortal()
@@ -82,11 +93,18 @@ namespace RPG.SceneManagement
 
         private void MovePlayerToSpawnPoint()
         {
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            player.GetComponent<NavMeshAgent>().enabled = false;
-            player.transform.position = this._spawnPoint.position;
-            player.transform.rotation = this._spawnPoint.rotation;
-            player.GetComponent<NavMeshAgent>().enabled = true;
+            _player = GameObject.FindGameObjectWithTag("Player");
+            _player.GetComponent<NavMeshAgent>().enabled = false;
+            _player.transform.position = this._spawnPoint.position;
+            _player.transform.rotation = this._spawnPoint.rotation;
+            _player.GetComponent<NavMeshAgent>().enabled = true;
+        }
+
+        private void TogglePlayerControl(bool toggle)
+        {
+            if(!toggle)
+                _player.GetComponent<ActionScheduler>().CancelCurrentAction();
+            _player.GetComponent<PlayerController>().enabled = toggle;
         }
     }
 }

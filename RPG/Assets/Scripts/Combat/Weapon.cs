@@ -54,6 +54,7 @@ namespace RPG.Combat
         public void LaunchProjectile(Transform rightHand, Transform leftHand, Health target, GameObject instigator, float damage)
         {
             Projectile projectileInstance = Instantiate(_projectile, GetHandTransform(rightHand, leftHand).position, Quaternion.identity);
+            // Launch Projectile Audio
             projectileInstance.SetTarget(target, instigator, damage);
         }
         public bool HasProjectile() { return _projectile != null; }
