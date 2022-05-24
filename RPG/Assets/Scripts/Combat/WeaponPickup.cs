@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using RPG.Attributes;
 using RPG.Control;
 using UnityEngine;
 
@@ -7,25 +8,35 @@ namespace RPG.Combat
 {
     public class WeaponPickup : MonoBehaviour, IRaycastable
     {
-        [SerializeField] private Weapon _weapon = null;
+        [SerializeField] private WeaponConfig _weapon = null;
+        [SerializeField] float _healthRegen = 0;
         [SerializeField] private float _respawnTimeSeconds = 5f;
 
         private void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.tag == "Player")
             {
-                Pickup(other.GetComponent<Fighter>());
+                Debug.Log("Player entered pickup collider");
+                Pickup(other.gameObject);
             }
         }
 
-        private void Pickup(Fighter fighter)
+        private void Pickup(GameObject subject)
         {
-            fighter.EquipWeapon(_weapon);
+            if(_weapon != null)
+            {
+                Debug.Log("Weapon nao eh nula, equipando em fighter");
+                subject.GetComponent<Fighter>().EquipWeapon(_weapon);
+            }
+            if(_healthRegen > 0)
+                subject.GetComponent<Health>().Heal(_healthRegen);
+
             StartCoroutine(HideForSeconds(_respawnTimeSeconds));
         }
 
         private IEnumerator HideForSeconds(float seconds)
         {
+            Debug.Log("Escondendo pickup");
             TogglePickup(false);
             yield return new WaitForSeconds(seconds);
             TogglePickup(true);
@@ -41,8 +52,10 @@ namespace RPG.Combat
         public bool HandleRaycast(PlayerController callingController)
         {
             if(Input.GetMouseButtonDown(0))
-                Pickup(callingController.GetComponent<Fighter>());
-
+            {
+                Debug.Log("Player clicou no pickup collider");
+                Pickup(callingController.gameObject);   
+            }
             return true;
         }
 

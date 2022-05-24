@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _weaponRange: 30
   _weaponDamage: 25
+  _weaponPercentageDamage: 10
   _isRightHand: 0
-  _equippedWeaponPrefab: {fileID: 5399344583505038825, guid: 2650f11905a666b41a77d3394c69e0bc,
+  _equippedWeaponPrefab: {fileID: 5005052879033673266, guid: 2650f11905a666b41a77d3394c69e0bc,
     type: 3}
   _projectile: {fileID: 6039783500130621341, guid: 58928591dda0ab04cb42ec1c7cbde293,
     type: 3}

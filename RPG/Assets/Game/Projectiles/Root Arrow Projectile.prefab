@@ -226,8 +226,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1e32163b12ab3444b9c84b3c313184d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 1
-  _isHoming: 1
+  _speed: 40
+  _isHoming: 0
   _hitEffect: {fileID: 0}
   _maxLifetime: 5
   _lifeAfterImpact: 0.2

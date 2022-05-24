@@ -48,6 +48,7 @@ namespace RPG.SceneManagement
             TogglePlayerControl(false);
 
             fader.FadeOut(_fadeOutTime);
+            yield return new WaitForSeconds(_fadeOutTime);
             MovePlayerToSpawnPoint();
 
             savingWrapper.Save();

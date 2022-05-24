@@ -1,4 +1,5 @@
-﻿using GameDevTV.Utils;
+﻿using System;
+using GameDevTV.Utils;
 using RPG.Core;
 using RPG.Saving;
 using RPG.Stats;
@@ -67,6 +68,11 @@ namespace RPG.Attributes
         public void RegenFullLife()
         {
             _healthPoints.value = GetMaxHealthPoints();
+        }
+
+        public void Heal(float healthRegen)
+        {
+            _healthPoints.value = Mathf.Min(GetMaxHealthPoints(), _healthPoints.value+healthRegen);
         }
 
         public float GetCurrentHealthPoints()
