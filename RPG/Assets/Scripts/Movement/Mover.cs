@@ -10,6 +10,7 @@ namespace RPG.Movement
     {
         // We can remove the serializeField, its on just for debug purposes
         [SerializeField] private float _maxSpeed = 6f;
+        [SerializeField] private float _maxNavPathDistance = 20f;
         private Transform _target;
 
         // Cached References
@@ -46,6 +47,25 @@ namespace RPG.Movement
         {
             _actionScheduler.StartAction(this);
             MoveTo(destination, speedFraction);
+        }
+
+        public bool CanMoveTo(Vector3 destination)
+        {
+            NavMeshPath path = new NavMeshPath();
+            bool hasPath = NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, path);
+            
+            if((!hasPath) || (path.status != NavMeshPathStatus.PathComplete) || (GetPathLength(path) > _maxNavPathDistance)) return false;
+            return true;
+        }
+
+        private float GetPathLength(NavMeshPath path)
+        {
+            float totalDistance = 0;
+            if(path.corners.Length < 2) return totalDistance;
+            for (int i=1; i < path.corners.Length; i++)
+                totalDistance += Vector3.Distance(path.corners[i-1], path.corners[i]);
+            
+            return totalDistance;
         }
 
         public void MoveTo(Vector3 destination, float speedFraction)

@@ -18,6 +18,8 @@ namespace RPG.Control
         [SerializeField] private PatrolPath _patrolPath;
         [SerializeField] private float _waypointTolerance = 1;
         [Range(0,1)][SerializeField] private float _patrolSpeedFraction = 0.2f;
+        [SerializeField] private float _aggroTime = 5f;
+        [SerializeField] private float _shoutDistance = 10f;
         private int _currentWaypointIndex = 0;
 
         // Cached reference
@@ -30,6 +32,7 @@ namespace RPG.Control
         private LazyValue<Vector3> _guardPosition;
         private float _timeSinceLastSawPlayer = Mathf.Infinity;
         private float _timeSinceEnteringWaypoint = Mathf.Infinity;
+        private float _timeSinceLastAggro = Mathf.Infinity;
 
 
         private void Awake()
@@ -50,14 +53,26 @@ namespace RPG.Control
         {
             if (_health.IsDead()) return;
 
-            if (DistanceToPlayer() < _chaseDistance && _fighter.CanAttack(_player))
+            if (IsAggrevated() && _fighter.CanAttack(_player))
                 AttackBehaviour();
             else if (_timeSinceLastSawPlayer < _suspicionTime)
                 SuspicionBehaviour();
             else
                 PatrolBehaviour();
-            
+
             UpdateTimers();
+        }
+
+        private bool IsAggrevated()
+        {
+            // check aggrevated
+            return (DistanceToPlayer() < _chaseDistance) || (_timeSinceLastAggro < _aggroTime);
+        }
+
+        public void Aggrevate()
+        {
+            // sets the timer
+            _timeSinceLastAggro = 0;
         }
 
         private Vector3 GetInitialGuardPosition()
@@ -69,12 +84,28 @@ namespace RPG.Control
         {
             _timeSinceLastSawPlayer = 0;
             _fighter.Attack(_player);
+
+            AggroNearbyEnemies();
+        }
+
+        private void AggroNearbyEnemies()
+        {
+            RaycastHit[] hits = Physics.SphereCastAll(transform.position, _shoutDistance, Vector3.up, 0);
+            foreach (RaycastHit hit in hits)
+            {
+                AIController ai = hit.transform.gameObject.GetComponent<AIController>();
+                
+                if(ai == null) continue;
+                
+                ai.Aggrevate();
+            }
         }
 
         private void UpdateTimers()
         {
             _timeSinceLastSawPlayer += Time.deltaTime;
             _timeSinceEnteringWaypoint += Time.deltaTime;
+            _timeSinceLastAggro += Time.deltaTime;
         }
 
         private void SuspicionBehaviour()
